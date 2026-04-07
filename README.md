@@ -1,6 +1,6 @@
 # Changes
 
-The code is probably not formatted the right way yet!
+The code is probably not formatted the right way yet (but it is well enthusiastic)!
 
 - `./fault_injection_campaign/` is completely dedicated to the project. Its core counterpart is at `./models/fault_injection/`
 
