@@ -1,9 +1,11 @@
 [submodule "core"]
 	path = core
-	url = https://github.com/gvsoc/gvsoc-core.git
+	url = git@github.com:enthusiastic-enthusiast/gvsoc-core-fault-injection.git
+	branch = fault-injection-support
 [submodule "pulp"]
 	path = pulp
-	url = https://github.com/gvsoc/gvsoc-pulp.git
+	url = git@github.com:enthusiastic-enthusiast/gvsoc-pulp-fault-injection.git
+	branch = master
 [submodule "gvtest"]
 	path = gvtest
 	url =  https://github.com/gvsoc/gvtest.git
