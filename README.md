@@ -1,3 +1,21 @@
+# Changes
+
+The code is probably not formatted the right way yet!
+
+- `./fault_injection_campaign/` is completely dedicated to the project. Its core counterpart is at `./models/fault_injection/`
+
+- Changes to `./pulp/pulp/chips/pulp_open/` to add fault-injection related option(s).
+
+- (Minor) changes to `./core/models/memory/` and `./core/models/cpu/iss/src/regfile.cpp` and related Python generator files (in the latter case also the header file).
+
+- (Tentative) changes to `./core/models/interco/router/` to make the router register with FIC if needed (for it to obtain global address map).
+
+- (Tentative/minor) changes to `./core/engine/mapping_tree{.hpp,.cpp}` to help obtaining info on global address space. 
+
+- (Minor) changes to `./core/engine/include/itf/io.hpp` to help integrate FI with the current router IO system.
+
+- (Minor) changes to `./core/models/cpu/iss/src/prefetch/prefetch_single_line.cpp` and associated header file to include support for prefetch buffer FI.
+
 # GVSoC
 
 GVSoC is the PULP chips simulator that is natively included in the Pulp SDK and is described and evaluated fully in Bruschi et al. [\[arXiv:2201.08166v1\]](https://arxiv.org/abs/2201.08166).
