@@ -91,10 +91,6 @@ l1_banks        = campaign.get_matching_devices(campaign.all_mems, r".*l1.*")
 l2_priv         = campaign.get_matching_devices(campaign.all_mems, r".*priv.*")
 l2_shared_cuts  = campaign.get_matching_devices(campaign.all_mems, r".*shared.*")
 
-print(f'The following {len(campaign.regions)} memory regions were extraced from interconnect maps:')
-for r in campaign.regions:
-    print(f'\t{r}')
-
 print(f'The following {len(campaign.pois)} locations will be checked for integrity:')
 for poi in campaign.pois:
     if poi.value != 0:

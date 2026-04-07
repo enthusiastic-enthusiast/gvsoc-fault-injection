@@ -3,7 +3,6 @@
 import os
 
 from dataclasses import dataclass
-from ficlib.campaign_manager import MemoryRegion
 from elftools.elf.elffile import ELFFile
 
 ALL_SYMBOLS         = 0
@@ -27,14 +26,10 @@ class PoI:
     is_symbol:          bool = False
     kind:               str | None = None
     binding:            str | None = None
-    region:             MemoryRegion = None
     dev:                str | None = None       # Try to get the path of the device...
 
     def __str__(self):
-        loc = ""
-        if self.region is not None:
-            loc = region.name
-        s = f'[0x{(self.addr):08x}-0x{(self.addr + self.size):08x}: {self.size:8}B {loc}] '
+        s = f'[0x{(self.addr):08x}-0x{(self.addr + self.size):08x}: {self.size:8}B] '
         if self.is_symbol:
             return s + f'{self.binding} {self.kind} "{self.name}"'
         elif self.name == '':

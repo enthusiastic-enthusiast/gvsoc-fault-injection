@@ -75,13 +75,6 @@ def final_reg_data_req_str():
     fault = final_reg_data_req()
     return fault.format_string()
 
-def final_interco_data_req():
-    return Fault(cmd=5)
-
-def final_interco_data_req_str():
-    fault = final_interco_data_req()
-    return fault.format_string()
-
 def final_prefs_data_req():
     return Fault(cmd=6)
 

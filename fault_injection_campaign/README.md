@@ -5,8 +5,6 @@
 
 - For now, we support "functional" fault injection analysis where we compare the final memory values of faulty runs with those of the golden run. Should we implement a more thorough fault injection analysis which involves dumping all memory reads/writes (with timestamps) of the golden run to account for timing as well? If so, how to do it efficiently?
 
-- We succeed at extracting global address map (assuming smol modifications to `engine`). However, the names there do not quite match the device names. It is easy to hardcode regex for pulp-open. However, is it possible to generalize it? 
-
 # Information
 
 - `ficlib` contains Python modules that help performing fault injection campaigns in GVSOC by interfacing the Fault Injection Controller subsystem inside the core.
@@ -45,28 +43,4 @@ Now, we classify faults as either:
 
 ## Numerical fault description
 
-Must be a table!? Also subject to change
-
-`{CMD} {KIND} {TARGET TYPE} {TARGET} {ADDR} {BIT} {DURATION} {L|H} {DELAY} {SIZE} {ID}`
-		   
-- `CMD`: specifies command (e.g. injection=0, hash=1, ...)
-		   
-- `KIND`: denotes the type of the above command (e.g. if cmd=0, then kind=0 means bitflip)
-
-- `TARGET TYPE`: if cmd=0, it means: memory=0, register=1
-		   
-- `TARGET`: denotes the target device ID relative to FIC receiving this fault request
-
-- `ADDR`: the address of the byte containing affected bit or the address of the region to hash
-		   
-- `BIT`: which bit of the byte is affected
-		   
-- `DURATION`: how long fault persists (transient only)
-		   
-- `L=0|H=1`: tied to low/high (transient only)
-		   
-- `DELAY`: after how many cycle injection happens
-
-- `SIZE`: size of the region to hash
-
-- `ID`: if cmd=0, specifies whether the target is memory=0 or register=1
+See `core/fault_injection/README.md``

@@ -42,29 +42,6 @@ GOLDEN_RUN_TID      = 777
 GOLDEN_RUN_RID      = 777
 
 @dataclass
-class MemoryRegion:
-    name:       str
-    id:         int
-    base:       int
-    size:       int
-    ico_path:   str
-
-    def __str__(self):
-        return f'{self.ico_path:30} {self.name:15} 0x{(self.base):08x}-0x{(self.base + self.size):08x}'
-
-    def __hash__(self):
-        return hash((self.name, self.id, self.base, self.size, self.ico_path))
-
-    def contains(self, addr):
-        return self.base <= addr < self.base + self.size
-
-def find_region(addr, regions):
-    return [ r for r in regions if r.contains(addr) ]
-
-def find_regions(start, end, regions):
-    return [ r for r in regions if start < r.base + r.size and r.base < end ]
-
-@dataclass
 class Cache:
     target:     int
     fic:        str
@@ -140,12 +117,6 @@ class CampaignManager:
     
     fic_to_caches:      dict[str, list] = None
 
-    # Extracted memory map
-    regions:            list = None
-
-    fic_to_regions:     dict[str, list] = None
-    region_to_fics:     dict[str, list] = None
-
     # Sanitized FIC paths for file handling
     san_fics:           dict[str, str] = None
 
@@ -183,9 +154,6 @@ class CampaignManager:
         self.pref_to_target     = {} 
 
         self.fic_to_caches      = {}
-
-        self.fic_to_regions     = {}
-        self.region_to_fics     = {}
 
         self.san_fics           = {}
         self.golden_cycles      = {}
@@ -282,8 +250,6 @@ class CampaignManager:
                 ff.write(f'{req}\n')
                 req = final_reg_data_req_str()
                 ff.write(f'{req}\n')
-                req = final_interco_data_req_str()
-                ff.write(f'{req}\n')
                 req = final_prefs_data_req_str()
                 ff.write(f'{req}\n')
                 req = final_caches_data_req_str()
@@ -302,7 +268,6 @@ class CampaignManager:
         self.all_regs       = []
         self.all_prefs      = []
         self.all_caches     = []
-        self.regions        = []
 
         self.regs   = []
         self.fregs  = []
@@ -361,38 +326,6 @@ class CampaignManager:
                     self.all_devices.append(dev)
                     self.all_regs.append(dev)
 
-            # Interconnects
-            self.fic_to_regions[fic] = []
-            idp = f'{self.builddir}/work_{GOLDEN_RUN_TID}/interco_data_{san_fic}'
-            with open(idp, 'r') as idf:
-                current_path = None
-                for line in idf:
-                    line = line.strip()
-
-                    if not line:
-                        continue
-                    elif line.startswith("/"):
-                        current_path = line
-                        continue
-
-                    parts = line.split()
-                    name, id_s, base_s, size_s = parts
-
-                    region = MemoryRegion(
-                        name=name,
-                        id=int(id_s),
-                        base=int(base_s),
-                        size=int(size_s),
-                        ico_path=current_path
-                    )
-
-                    if region not in self.regions:
-                        self.regions.append(region)
-                        self.region_to_fics[region] = []
-
-                    self.fic_to_regions[fic].append(region)
-                    self.region_to_fics[region].append(fic)
-
             # Prefetchers
             self.fic_to_prefs[fic] = []
             pdp = f'{self.builddir}/work_{GOLDEN_RUN_TID}/prefetchers_data_{san_fic}'
@@ -443,8 +376,6 @@ class CampaignManager:
 
             if os.path.exists(f'{self.builddir}/faults/{san_fic}'):
                 os.remove(f'{self.builddir}/faults/{san_fic}')
-
-        self.regions.sort(key=lambda r: r.base)
 
         if os.path.exists(f'{self.builddir}/work_{GOLDEN_RUN_TID}'):
             shutil.rmtree(f'{self.builddir}/work_{GOLDEN_RUN_TID}')
@@ -579,34 +510,3 @@ class CampaignManager:
         g_masked = self.total_runs - g_sdc - g_sim_crash - g_due
 
         print( f'\nOUT OF {self.total_runs} RUNS: {g_masked} MASKED, {g_sdc} SDC, {g_due} DUE, {g_sim_crash} SIMULATOR FAULTED')
-
-def try_resolve_dev(campaign, poi):
-    # Find all smallest enclosures that 
-    # are not contained within each other
-    idoms = None
-    for r in poi.regions:
-        if idoms is None:
-            idoms = [r]
-            continue
-        to_include = True
-        for i in idoms:
-            if (i.base <= r.base and (r.base + r.size) < (i.base + i.size)) \
-                    or (i.base < r.base and (r.base + r.size) <= (i.base + i.size)):
-                idoms.remove(i)
-            elif (r.base <= i.base and (i.base + i.size) < (r.base + r.size)) \
-                    or (r.base < i.base and (i.base + i.size) <= (r.base + r.size)):
-                to_include = False
-                break
-        if to_include:
-            idoms.append(r)
-
-    for path in campaign.mems:
-        san_path = path.strip("/").split("/")
-        dev = san_path[-1]
-        # We should do longest-match search here...
-        # but it will be bad anyways
-        for i in idoms:
-            if i.name == dev:
-                return dev
-            if i.name in dev or dev in i.name:
-                return dev
